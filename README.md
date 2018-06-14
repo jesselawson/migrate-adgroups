@@ -4,6 +4,17 @@ A simple PS CLI tool to migrate one set of Active Directory group containers fro
 
 ## Quickstart
 
+### Parameters
+
+| Param | Type | Example | Default | 
+|:-------------------|:------------|:------------------------------|:---------------------------------------|
+| -SourceServer      | String      | `-SourceServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot` |
+| -SourcePath        | String      | `-SourcePath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory) |
+| -DestinationServer | String      | `-DestinationServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot` |
+| -DestinationPath   | String      | `-DestinationPath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory) |
+
+### Example
+
 ```powershell
 PS C:\Jesse> .\migrate-adgroups.ps1 -SourceServer "source.abc" -SourcePath "OU=SourceInnerFolder,OU=SourceOuterFolder,DC=source,DC=abc" -DestinationServer "destination.xyz" "OU=DestinationInnerFolder,OU=DestinationOuterFolder,DC=destination,DC=xyz"
 ```

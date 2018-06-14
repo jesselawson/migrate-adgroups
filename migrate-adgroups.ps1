@@ -6,6 +6,14 @@ $sourceServer = "infosys.bcc"
 $destinationPath = "OU=ReportServer,OU=IS,DC=campus,DC=network,DC=bcc" 
 $destinationServer = "campus.network.bcc"
 
+param (
+	# Default source and destination is DNSRoot from Get-ADDomain
+	[string]$SourceServer = Get-ADDomain | Select-Object DNSRoot,
+	[Parameter(Mandatory=$true)][string]$SourcePath,
+	[string]$DestinationServer = Get-ADDomain | Select-Object DNSRoot,
+	[Parameter(Mandatory=$true)][string]$DestinationPath
+)
+	
 # Get list of all CNs from source
 $SourceGroups = $null
 
