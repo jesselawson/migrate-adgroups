@@ -9,9 +9,10 @@ A simple PS CLI tool to migrate one set of Active Directory group containers fro
 | Param              | Type        | Example                       | Default                                              |
 |:-------------------|:------------|:------------------------------|:-----------------------------------------------------|
 | -SourceServer      | String, Optional      | `-SourceServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot`               |
-| -SourcePath        | String, Mandatory      | `-SourcePath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory)      |
+| -SourcePath        | String, Mandatory     | `-SourcePath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory)      |
 | -DestinationServer | String, Optional      | `-DestinationServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot`          |
-| -DestinationPath   | String, Mandatory      | `-DestinationPath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory) |
+| -DestinationPath   | String, Mandatory     | `-DestinationPath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory) |
+| -UsersServer       | String, Optional      | `-UsersServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot` |
 | -ShowConflicts     | Switch, Optional      | `-ShowConflicts` | off |
 | -Verbose           | Switch, Optional      | `-Verbose` | off |
 
@@ -86,6 +87,13 @@ kitchen.com
 So, when you pass a path variable, you are basically saying "use this as the second part of the distinguishedName," where the first part will be "CN=<groupname>."
 
 When using `migrate-adgroups`, you want to pass the source Path as the OU hierarchy where all the CN's (the groups) live. You want to do the **same thing** for the source path. 
+
+### Important Considerations 
+
+* A group existing on your destination server but not necessarily in your destination path will trigger a merge conflict, BUT that group will be used for the migration.
+
+* The script will straight up ignore any groups from the source if there is an AD account with the same name on the target. You'll have to manually move these over (sorry). Look on the bright side, though: at least you get a handy `merge-conflicts.txt` file that gives you a checklist of which ones you need to worry about!
+
 
 ## Optional Flags
 
