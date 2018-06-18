@@ -8,10 +8,12 @@ A simple PS CLI tool to migrate one set of Active Directory group containers fro
 
 | Param              | Type        | Example                       | Default                                              |
 |:-------------------|:------------|:------------------------------|:-----------------------------------------------------|
-| -SourceServer      | String      | `-SourceServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot`               |
-| -SourcePath        | String      | `-SourcePath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory)      |
-| -DestinationServer | String      | `-DestinationServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot`          |
-| -DestinationPath   | String      | `-DestinationPath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory) |
+| -SourceServer      | String, Optional      | `-SourceServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot`               |
+| -SourcePath        | String, Mandatory      | `-SourcePath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory)      |
+| -DestinationServer | String, Optional      | `-DestinationServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot`          |
+| -DestinationPath   | String, Mandatory      | `-DestinationPath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory) |
+| -ShowConflicts     | Switch, Optional      | `-ShowConflicts` | off |
+| -Verbose           | Switch, Optional      | `-Verbose` | off |
 
 ### Example
 
@@ -85,3 +87,21 @@ So, when you pass a path variable, you are basically saying "use this as the sec
 
 When using `migrate-adgroups`, you want to pass the source Path as the OU hierarchy where all the CN's (the groups) live. You want to do the **same thing** for the source path. 
 
+## Optional Flags
+
+### -ShowConflicts
+
+If you enable the ShowConflicts flag, you'll get a table at the end of the migration that shows you all of the migration conflicts. There are really only two conflicts that can occur: either A) your group name already exists as a group on the destination server, or B) your group name already exists as an account on the destination server. The former type of conflicts are easily ignored, but the latter are ones that will cause headaches. 
+
+Example output: 
+
+```
+Name 			Value
+My Group		An account with this name already exists in the destination server, preventing a group with the same name from being migrated.
+Some Group		This group already exists on the destination server.
+Another Group	This group already exists on the destination server.
+One Group		An account with this name already exists in the destination server, preventing a group with the same name from being migrated.
+Two Group		This group already exists on the destination server.
+Red Group		An account with this name already exists in the destination server, preventing a group with the same name from being migrated.
+Blue Group 		This group already exists on the destination server.
+```

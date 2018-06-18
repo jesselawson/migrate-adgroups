@@ -34,7 +34,7 @@ function Show-HelpScreen {
 	write-host " -DestinationServer `tThe Name.ParentDomain of the AD server you're migrating to."
 	write-host "*" -ForegroundColor Red -NoNewLine 
 	write-host " -DestinationPath `tThe DistinguishedName of the OU where you want to migrate the AD Groups in the SourcePath to."
-	write-host "  -ShowConflicts `tWill give you a table of migration conflicts that ocurred during migration."
+	write-host "  -ShowConflicts `tWill give you a table (console + txt file) of migration conflicts that ocurred during migration."
 	write-host "  -Verbose `t`tOutputs details of every group during migration.`n"
 	write-host "`t*required" -ForegroundColor Red
 	write-host "`n========================================================" -ForegroundColor Yellow
@@ -69,19 +69,19 @@ finally {
 foreach ( $Group in $SourceGroups ) {
 	if($Group.objectClass -eq "group") {
 		$GroupName = $Group.Name
-		write-host "Found Source Group: $GroupName"
+		if($Verbose) { write-host "Found Source Group: $GroupName" }
 		
 		$GroupMigrated = 0
 		
 		# Does this group exist on the destination?
 		if(Get-ADGroup -Filter {Name -eq $GroupName} -Server $DestinationServer -SearchBase $DestinationPath) {
-			write-host "> This group already exists on the destination. Skipping."
+			if($Verbose) { write-host "> This group already exists on the destination. Skipping." }
 			$GroupMigrated = 1
 		} else {
 			# Create the group on the destination
 			try {
 				New-ADGroup -Server $DestinationServer -Path $DestinationPath -Name $GroupName -GroupScope $Group.GroupScope -GroupCategory $Group.GroupCategory
-				write-host "> Creating group on destination... "
+				if($Verbose) { write-host "> Creating group on destination... " }
 			} catch {
 				# Give helpful feedback if there is a problem where an AD Account exists on the destination server that is the same name as 
 				# the AD Group from the source server. This is such a headache if you aren't prepared for this during migration.
@@ -107,7 +107,7 @@ foreach ( $Group in $SourceGroups ) {
 #hit any key to continue."
 #					$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
 				}
-				write-host "Conflict Encountered. Could not create group $GroupName because: $ErrorMessage"
+				if($Verbose) { write-host "Conflict Encountered. Could not create group $GroupName because: $ErrorMessage" }
 			} 	
 		}
 		
@@ -119,10 +119,7 @@ foreach ( $Group in $SourceGroups ) {
 }
 
 if($ShowConflicts) {
-
+	$MigrationConflicts | Out-File migration-conflicts.txt -Encoding UTF8
 	$MigrationConflicts | Format-Table -AutoSize
-
-
-
 }
 # At the end, let's write out the migration conflicts if that's what we want.
