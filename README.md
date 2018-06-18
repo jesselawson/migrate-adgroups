@@ -6,11 +6,11 @@ A simple PS CLI tool to migrate one set of Active Directory group containers fro
 
 ### Parameters
 
-| Param | Type | Example | Default | 
-|:-------------------|:------------|:------------------------------|:---------------------------------------|
-| -SourceServer      | String      | `-SourceServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot` |
-| -SourcePath        | String      | `-SourcePath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory) |
-| -DestinationServer | String      | `-DestinationServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot` |
+| Param              | Type        | Example                       | Default                                              |
+|:-------------------|:------------|:------------------------------|:-----------------------------------------------------|
+| -SourceServer      | String      | `-SourceServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot`               |
+| -SourcePath        | String      | `-SourcePath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory)      |
+| -DestinationServer | String      | `-DestinationServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot`          |
 | -DestinationPath   | String      | `-DestinationPath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory) |
 
 ### Example

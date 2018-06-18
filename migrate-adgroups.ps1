@@ -4,7 +4,8 @@ param (
 	[string]$SourcePath,
 	[string]$DestinationServer = (Get-ADDomain | Select-Object DNSRoot | Out-String),
 	[string]$DestinationPath,
-	[switch]$ShowConflicts
+	[switch]$ShowConflicts,
+	[switch]$Verbose
 )
 
 $WhoAmI = "Migrate ADGroups"
@@ -22,10 +23,8 @@ function Show-HelpScreen {
 	write-host "$WhoAmI (v$Version) by $WhoWroteMe`n"
 	write-host "USAGE:"
 	write-host ".\migrate-adgroups.ps1 " -ForegroundColor Green -NoNewLine
-	write-host "-SourceServer <string> -SourcePath <string> -DestinationServer <string> -DestinationPath <string>" -ForegroundColor Gray
-	write-host "or"
-	write-host ".\migrate-adgroups.ps1 " -ForegroundColor DarkGreen -NoNewLine
-	write-host "-SourceServer <string> -SourcePath <string> -DestinationServer <string> -DestinationPath <string> -ShowConflicts`n" -ForegroundColor Gray
+	write-host "-SourceServer <string> -SourcePath <string> -DestinationServer <string> -DestinationPath <string> [-ShowConflicts] [-Verbose]`n" -ForegroundColor Gray
+	
 	write-host "PARAMETERS: "
 	write-host "*" -ForegroundColor Red -NoNewLine 
 	write-host " -SourceServer `tThe Name.ParentDomain of the AD server you're migrating from."
@@ -35,7 +34,8 @@ function Show-HelpScreen {
 	write-host " -DestinationServer `tThe Name.ParentDomain of the AD server you're migrating to."
 	write-host "*" -ForegroundColor Red -NoNewLine 
 	write-host " -DestinationPath `tThe DistinguishedName of the OU where you want to migrate the AD Groups in the SourcePath to."
-	write-host "  -ShowConflicts `tEquivalent of a WhatIf. No migration takes place, and instead you'll get a table of all migration conflicts.`n"
+	write-host "  -ShowConflicts `tWill give you a table of migration conflicts that ocurred during migration."
+	write-host "  -Verbose `t`tOutputs details of every group during migration.`n"
 	write-host "`t*required" -ForegroundColor Red
 	write-host "`n========================================================" -ForegroundColor Yellow
 	exit
@@ -87,27 +87,27 @@ foreach ( $Group in $SourceGroups ) {
 				# the AD Group from the source server. This is such a headache if you aren't prepared for this during migration.
 				$ErrorMessage = $_.Exception.Message
 				if($ErrorMessage -like "*group already exists*") { 
-					$MigrationConflicts.add($Conflict.GroupAlreadyExists, $GroupName)
-					write-host "`nWARNING:`n" -NoNewLine -ForegroundColor Red 
-					write-host "          There is already a group with the name $GroupName on the destination server...
-          BUT that account is not in the migrated group folder--it just exists somewhere on your destination server.
-          Therefore, the existing group on the destination server with the name $GroupName is going to be used to 
-		  migrate over all the accounts listed in the same group on the source server.
-          IF YOU DO NOT WANT TO MIGRATE THAT GROUP until you have time to figure out what is going on,
-          BAIL OUT of this script immediately by pressing CTRL+C.`n`nOtherwise, press any key to continue."
-					$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+					$MigrationConflicts.add($GroupName, $Conflict.GroupAlreadyExists)
+					#write-host "`nWARNING:`n" -NoNewLine -ForegroundColor Red 
+					#write-host "          There is already a group with the name $GroupName on the destination server...
+#		  BUT that account is not in the migrated group folder--it just exists somewhere on your destination server.
+#          Therefore, the existing group on the destination server with the name $GroupName is going to be used to 
+#		  migrate over all the accounts listed in the same group on the source server.
+#          IF YOU DO NOT WANT TO MIGRATE THAT GROUP until you have time to figure out what is going on,
+#          BAIL OUT of this script immediately by pressing CTRL+C.`n`nOtherwise, press any key to continue."
+#					$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
 				}
 				
 				if($ErrorMessage -like "*account already exists*") {
-					$MigrationConflicts.add($Conflict.AccountAlreadyExists, $GroupName)
-					write-host "`nWARNING:`n" -NoNewLine -ForegroundColor Red
-					write-host "          While trying to migrate over the group ""$GroupName"" from the source server,
-it turns out there is an account on the destination server with that exact same name. You'll need to fix this, as you
-cannot have an account and group in AD with the same name. I recommend bailing out of this script (CTRL+C), otherwise,
-hit any key to continue."
-					$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+					$MigrationConflicts.add($GroupName, $Conflict.AccountAlreadyExists)
+#					write-host "`nWARNING:`n" -NoNewLine -ForegroundColor Red
+#					write-host "          While trying to migrate over the group ""$GroupName"" from the source server,
+#it turns out there is an account on the destination server with that exact same name. You'll need to fix this, as you
+#cannot have an account and group in AD with the same name. I recommend bailing out of this script (CTRL+C), otherwise,
+#hit any key to continue."
+#					$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
 				}
-				write-host "ERROR: Could not create group $GroupName : $ErrorMessage"
+				write-host "Conflict Encountered. Could not create group $GroupName because: $ErrorMessage"
 			} 	
 		}
 		
@@ -118,4 +118,11 @@ hit any key to continue."
 	}
 }
 
+if($ShowConflicts) {
+
+	$MigrationConflicts | Format-Table -AutoSize
+
+
+
+}
 # At the end, let's write out the migration conflicts if that's what we want.
