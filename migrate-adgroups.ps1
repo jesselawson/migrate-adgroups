@@ -35,7 +35,8 @@ function Show-HelpScreen {
 	write-host " -DestinationServer `tThe Name.ParentDomain of the AD server you're migrating to."
 	write-host "*" -ForegroundColor Red -NoNewLine 
 	write-host " -DestinationPath `tThe DistinguishedName of the OU where you want to migrate the AD Groups in the SourcePath to."
-	write-host "  -UsersServer `t`tSpecify the AD server where the user accounts exist. Defaults to Get-ADDomain."
+	write-host "*" -ForegroundColor Red -NoNewLine 
+	write-host " -UsersServer `tSpecify the AD server where the user accounts exist. Defaults to Get-ADDomain."
 	write-host "  -ShowConflicts `tWill give you a table (console + txt file) of migration conflicts that ocurred during migration."
 	write-host "  -Verbose `t`tOutputs details of every group during migration.`n"
 	write-host "`t*required" -ForegroundColor Red
@@ -146,7 +147,7 @@ hit any key to continue."
 					$TargetGroup = Get-AdGroup -Filter { Name -eq $GroupName } -server $DestinationServer
 					
 					# Add user to group 
-					if(Get-AdGroupMember -Identity $TargetGroup -Members $TheUser -Server $UsersServer) {
+					if(Get-ADUser -Identity $UserName -Server $UsersServer) {
 						# This member has already been migrated; skip.
 						if($Verbose) { write-host "SKIPPED. Already migrated." }
 					} else {
@@ -155,19 +156,15 @@ hit any key to continue."
 						} catch {
 							$ErrorMessage = $_.Exception.Message
 							write-host "ERROR: $ErrorMessage"
-						}
-					} finally {
-						# Check again
-						if(Get-AdGroupMember -Identity $TargetGroup -Members $TheUser -Server $UsersServer) {
-							if($Verbose) { write-host "DONE." }
+						} finally {
+							# Check again
+							if(Get-ADUser -Identity $UserName -Server $UsersServer) {
+								if($Verbose) { write-host "DONE." }
+							}
 						}
 					}
 				}
-			}
-		
-			# TODO: Get all users in this 
-			# TODO: Add them to destination group 
-		
+			}	
 		}
 	}
 }

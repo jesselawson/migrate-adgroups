@@ -6,15 +6,15 @@ A simple PS CLI tool to migrate one set of Active Directory group containers fro
 
 ### Parameters
 
-| Param              | Type        | Example                       | Default                                              |
-|:-------------------|:------------|:------------------------------|:-----------------------------------------------------|
-| -SourceServer      | String, Optional      | `-SourceServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot`               |
-| -SourcePath        | String, Mandatory     | `-SourcePath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory)      |
-| -DestinationServer | String, Optional      | `-DestinationServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot`          |
+| Param              | Type                  | Example                       | Default                                              |
+|:-------------------|:----------------------|:-----------------------------------------------------------------|:------------------|
+| -SourceServer      | String, Optional      | `-SourceServer "example.com"`                                    | (none; mandatory) |
+| -SourcePath        | String, Mandatory     | `-SourcePath "OU=Folder,OU=AnotherFolder,DC=example,DC=com`      | (none; mandatory) |
+| -DestinationServer | String, Optional      | `-DestinationServer "example.com"`                               | (none; mandatory) |
 | -DestinationPath   | String, Mandatory     | `-DestinationPath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory) |
-| -UsersServer       | String, Optional      | `-UsersServer "example.com"` | `Get-ADDomain | Select-Object DNSRoot` |
-| -ShowConflicts     | Switch, Optional      | `-ShowConflicts` | off |
-| -Verbose           | Switch, Optional      | `-Verbose` | off |
+| -UsersServer       | String, Mandatory     | `-UsersServer "example.com"`                                     | (none; mandatory) |
+| -ShowConflicts     | Switch, Optional      | `-ShowConflicts`                                                 | off               |
+| -Verbose           | Switch, Optional      | `-Verbose`                                                       | off               |
 
 ### Example
 
