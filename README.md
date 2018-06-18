@@ -19,7 +19,7 @@ A simple PS CLI tool to migrate one set of Active Directory group containers fro
 ### Example
 
 ```powershell
-PS C:\Jesse> .\migrate-adgroups.ps1 -SourceServer "source.abc" -SourcePath "OU=SourceInnerFolder,OU=SourceOuterFolder,DC=source,DC=abc" -DestinationServer "destination.xyz" "OU=DestinationInnerFolder,OU=DestinationOuterFolder,DC=destination,DC=xyz"
+PS C:\Jesse> .\migrate-adgroups.ps1 -SourceServer "source.abc" -SourcePath "OU=SourceInnerFolder,OU=SourceOuterFolder,DC=source,DC=abc" -DestinationServer "destination.xyz" "OU=DestinationInnerFolder,OU=DestinationOuterFolder,DC=destination,DC=xyz" -UsersServer "destination.xyz"
 ```
 
 ## Usage

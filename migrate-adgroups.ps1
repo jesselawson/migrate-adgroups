@@ -44,7 +44,7 @@ function Show-HelpScreen {
 	exit
 }
 
-if($SourcePath -eq "" -or $DestinationPath -eq "") {
+if($SourcePath -eq "" -or $DestinationPath -eq "" -or $SourceServer -eq "" -or $DestinationServer -eq "" -or $UsersServer -eq "") {
 	Show-HelpScreen
 	exit
 }
