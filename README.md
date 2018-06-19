@@ -6,15 +6,26 @@ A simple PS CLI tool to migrate one set of Active Directory group containers fro
 
 ### Parameters
 
-| Param              | Type                  | Example                       | Default                                              |
-|:-------------------|:----------------------|:-----------------------------------------------------------------|:------------------|
-| -SourceServer      | String, Optional      | `-SourceServer "example.com"`                                    | (none; mandatory) |
-| -SourcePath        | String, Mandatory     | `-SourcePath "OU=Folder,OU=AnotherFolder,DC=example,DC=com`      | (none; mandatory) |
-| -DestinationServer | String, Optional      | `-DestinationServer "example.com"`                               | (none; mandatory) |
-| -DestinationPath   | String, Mandatory     | `-DestinationPath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory) |
-| -UsersServer       | String, Mandatory     | `-UsersServer "example.com"`                                     | (none; mandatory) |
-| -ShowConflicts     | Switch, Optional      | `-ShowConflicts`                                                 | off               |
-| -Verbose           | Switch, Optional      | `-Verbose`                                                       | off               |
+| Param                 | Type                  | Example                       | Default                                              |
+|:----------------------|:----------------------|:-----------------------------------------------------------------|:------------------|
+| -SourceServer         | String, Optional      | `-SourceServer "example.com"`                                    | (none; mandatory) |
+| -SourcePath           | String, Mandatory     | `-SourcePath "OU=Folder,OU=AnotherFolder,DC=example,DC=com`      | (none; mandatory) |
+| -DestinationServer    | String, Optional      | `-DestinationServer "example.com"`                               | (none; mandatory) |
+| -DestinationPath      | String, Mandatory     | `-DestinationPath "OU=Folder,OU=AnotherFolder,DC=example,DC=com` | (none; mandatory) |
+| -UsersServer          | String, Mandatory     | `-UsersServer "example.com"`                                     | (none; mandatory) |
+| -FixConflictsByAdding | String, Optional      | `-FixConflictsByAdding "Report Viewer"`                          | (none)            |
+| -ShowConflicts        | Switch, Optional      | `-ShowConflicts`                                                 | off               |
+| -Verbose              | Switch, Optional      | `-Verbose`                                                       | off               |
+
+### Param Details 
+* **-SourceServer <string>**: The Name.ParentDomain of the AD server you're migrating from.
+* **-SourcePath <string>**: The DistinguishedName of the OU where the AD Groups you want to migrate are.
+* **-DestinationServer <string>**: The Name.ParentDomain of the AD server you're migrating to.
+* **-DestinationPath <string>**: The DistinguishedName of the OU where you want to migrate the AD Groups in the SourcePath to.
+* **-UsersServer <string>**: Specify the AD server where the user accounts exist.
+* **-FixConflictsByAdding <string>**: If there's a group conflict, fix it by creating a new group with <string> appended.
+* **-ShowConflicts**: Will give you a table (console + txt file) of migration conflicts that ocurred during migration.
+* **-Verbose**: Activate sadist mode.
 
 ### Example
 
@@ -94,6 +105,7 @@ When using `migrate-adgroups`, you want to pass the source Path as the OU hierar
 
 * The script will straight up ignore any groups from the source if there is an AD account with the same name on the target. You'll have to manually move these over (sorry). Look on the bright side, though: at least you get a handy `merge-conflicts.txt` file that gives you a checklist of which ones you need to worry about!
 
+* This script DOES NOT migrate groups inside groups. In other words, it only migrates a folder of groups that contain users--it will not migrate a folder of groups that may contain other groups.
 
 ## Optional Flags
 
@@ -105,11 +117,19 @@ Example output:
 
 ```
 Name 			Value
-My Group		An account with this name already exists in the destination server, preventing a group with the same name from being migrated.
-Some Group		This group already exists on the destination server.
-Another Group	This group already exists on the destination server.
-One Group		An account with this name already exists in the destination server, preventing a group with the same name from being migrated.
-Two Group		This group already exists on the destination server.
-Red Group		An account with this name already exists in the destination server, preventing a group with the same name from being migrated.
+My Group 		An account with this name already exists in the destination server, preventing a group with the same name from being migrated.
+Some Group 		This group already exists on the destination server.
+Another Group 		This group already exists on the destination server.
+One Group 		An account with this name already exists in the destination server, preventing a group with the same name from being migrated.
+Two Group 		This group already exists on the destination server.
+Red Group 		An account with this name already exists in the destination server, preventing a group with the same name from being migrated.
 Blue Group 		This group already exists on the destination server.
 ```
+
+## Changelog
+
+**1.1**
+- Added `-FixConflictsByAdding` param
+
+**1.0**
+- Initial Release
